@@ -109,6 +109,8 @@ public class BitbucketSCMNavigator extends SCMNavigator {
     @NonNull
     private final String repoOwner;
     @NonNull
+    private boolean passUnstableBuilds;
+    @NonNull
     private List<SCMTrait<? extends SCMTrait<?>>> traits;
     @Deprecated
     @Restricted(NoExternalUse.class)
@@ -142,6 +144,7 @@ public class BitbucketSCMNavigator extends SCMNavigator {
         this.repoOwner = repoOwner;
         this.traits = new ArrayList<>();
         this.credentialsId = null; // highlighting the default is anonymous unless you configure explicitly
+        this.passUnstableBuilds = false;
     }
 
     @Deprecated // retained for binary compatibility
@@ -215,6 +218,16 @@ public class BitbucketSCMNavigator extends SCMNavigator {
     @NonNull
     public List<SCMTrait<? extends SCMTrait<?>>> getTraits() {
         return Collections.<SCMTrait<? extends SCMTrait<?>>>unmodifiableList(traits);
+    }
+
+    @NonNull
+    public boolean getPassUnstableBuilds() {
+        return passUnstableBuilds;
+    }
+
+    @NonNull
+    public void setPassUnstableBuilds(boolean status) {
+        this.passUnstableBuilds = status;
     }
 
     @DataBoundSetter
@@ -808,7 +821,8 @@ public class BitbucketSCMNavigator extends SCMNavigator {
                     serverUrl,
                     credentialsId,
                     repoOwner,
-                    projectName)
+                    projectName,
+                    passUnstableBuilds)
                     .withRequest(request)
                     .build();
         }

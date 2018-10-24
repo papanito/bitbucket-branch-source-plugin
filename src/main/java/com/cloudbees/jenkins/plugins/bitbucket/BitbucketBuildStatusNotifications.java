@@ -98,7 +98,8 @@ public class BitbucketBuildStatusNotifications {
     }
 
     private static void createStatus(@NonNull Run<?, ?> build, @NonNull TaskListener listener,
-        @NonNull BitbucketApi bitbucket, @NonNull String key, @NonNull String hash)
+        @NonNull BitbucketApi bitbucket, @NonNull String key, @NonNull String hash,
+        @NonNull boolean passUnstableBuilds)
             throws IOException, InterruptedException {
 
         String url;
@@ -124,7 +125,11 @@ public class BitbucketBuildStatusNotifications {
             state = "SUCCESSFUL";
         } else if (Result.UNSTABLE.equals(result)) {
             statusDescription = StringUtils.defaultIfBlank(buildDescription, "This commit has test failures.");
-            state = "FAILED";
+            if (passUnstableBuilds) {
+                state = "SUCCESSFUL";
+            } else {
+                state = "FAILED";
+            }
         } else if (Result.FAILURE.equals(result)) {
             statusDescription = StringUtils.defaultIfBlank(buildDescription, "There was a failure building this commit.");
             state = "FAILED";
@@ -182,7 +187,7 @@ public class BitbucketBuildStatusNotifications {
             key = getBuildKey(build, r.getHead().getName(), shareBuildKeyBetweenBranchAndPR);
             bitbucket = source.buildBitbucketClient();
         }
-        createStatus(build, listener, bitbucket, key, hash);
+        createStatus(build, listener, bitbucket, key, hash, source.getPassUnstableBuilds());
     }
 
     @CheckForNull
